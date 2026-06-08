@@ -96,40 +96,15 @@ export default function TripConfigForm({ onSubmit, initialValues }) {
   const tier = getBudgetTier();
 
   return (
-    <div className="hero-split-container">
-      {/* 左侧：品牌展示与美学海报 */}
-      <div className="hero-branding-section">
-        <div className="hero-badge">✨ 预算及线路双驱动智能分析</div>
-        <h2 className="hero-title">遇见下一个远方<br />从精准路线与预算开始</h2>
-        <p className="hero-subtitle">
-          漫游规划家能够智能解析景点几何中心，精细估算交通里程，智能排除社交媒体避坑酒店，并严格精算每日剩余吃喝玩乐水位，让您的旅行不仅好玩、少走冤枉路，而且预算尽在掌握。
-        </p>
-        <div className="hero-cities-gallery">
-          <div className="gallery-item bg-beijing">
-            <div className="gallery-card-content">
-              <span className="city-tag">📍 北京</span>
-              <span className="city-desc">皇家历史与现代影城</span>
-            </div>
-          </div>
-          <div className="gallery-item bg-sanya">
-            <div className="gallery-card-content">
-              <span className="city-tag">📍 三亚</span>
-              <span className="city-desc">椰林海风与奢华海岛</span>
-            </div>
-          </div>
-          <div className="gallery-item bg-chengdu">
-            <div className="gallery-card-content">
-              <span className="city-tag">📍 成都</span>
-              <span className="city-desc">安逸宽窄与烟火火锅</span>
-            </div>
-          </div>
-        </div>
+    <div className="minimalist-config-container">
+      <div className="minimalist-header">
+        <span className="minimalist-tag">ROAMPLANNER 漫游规划家</span>
+        <h2 className="minimalist-title">Where to next?</h2>
+        <p className="minimalist-subtitle">输入目的地与预算，开启您的智能定制行程</p>
       </div>
 
-      {/* 右侧：表单配置卡片 */}
-      <div className="hero-form-section">
-        <div className="glass-card config-form">
-          <h3 className="form-title">开始配置您的定制行程</h3>
+      <div className="minimalist-card-wrapper">
+        <div className="glass-card config-form minimalist-card">
           <form onSubmit={handleSubmit}>
             <div className="input-row">
               <div className="form-group" style={{ position: 'relative' }}>

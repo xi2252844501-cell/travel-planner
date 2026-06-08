@@ -1583,148 +1583,70 @@ header {
    2026-06-08 UI Redesign & Polish Styles (Branch feature/ui-redesign)
    ========================================================================== */
 
-/* 1. 左右分栏海报式 Hero 布局 (首屏) */
-.hero-split-container {
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
-  padding: 1.5rem 0;
-  max-width: 1280px;
+/* 1. Nordic Minimalist 居中留白画报首屏布局 */
+.minimalist-config-container {
+  max-width: 650px;
   margin: 0 auto;
+  padding: 5rem 1.5rem;
+  text-align: center;
+  animation: fadeInUp 0.8s ease-out;
 }
 
-@media (min-width: 992px) {
-  .hero-split-container {
-    display: grid;
-    grid-template-columns: 4.5fr 5.5fr;
-    gap: 4.5rem;
-    align-items: center;
-    padding: 3rem 0;
-  }
+.minimalist-header {
+  margin-bottom: 3.5rem;
 }
 
-.hero-branding-section {
-  text-align: left;
-  animation: fadeInLeft 0.8s ease-out;
-}
-
-.hero-badge {
-  display: inline-block;
-  padding: 0.35rem 0.85rem;
-  border-radius: 30px;
-  background: var(--primary-glow);
-  color: var(--primary);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-bottom: 1.2rem;
-  border: 1px solid rgba(231, 111, 81, 0.15);
-}
-
-.hero-title {
-  font-family: var(--font-title);
-  font-size: 2.8rem;
-  color: var(--text-dark);
-  line-height: 1.25;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  margin-bottom: 1.5rem;
-}
-
-.hero-title br {
-  display: none;
-}
-
-@media (min-width: 768px) {
-  .hero-title br {
-    display: inline;
-  }
-}
-
-.hero-subtitle {
-  font-size: 0.95rem;
-  color: var(--text-muted);
-  line-height: 1.65;
-  margin-bottom: 2.5rem;
-}
-
-.hero-cities-gallery {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-}
-
-.gallery-item {
-  border-radius: 16px;
-  height: 125px;
-  display: flex;
-  align-items: flex-end;
-  padding: 1rem;
-  border: 1px solid var(--card-border);
-  position: relative;
-  overflow: hidden;
-  transition: var(--transition-smooth);
-  box-shadow: 0 4px 10px rgba(74, 62, 61, 0.02);
-}
-
-.gallery-item:hover {
-  transform: translateY(-4px);
-  border-color: var(--primary);
-  box-shadow: 0 8px 20px rgba(231, 111, 81, 0.1);
-}
-
-/* 渐变遮罩 */
-.gallery-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(to bottom, rgba(251, 249, 244, 0) 10%, rgba(251, 249, 244, 0.95) 95%);
-  z-index: 1;
-}
-
-.bg-beijing {
-  background: linear-gradient(135deg, rgba(231, 111, 81, 0.1), rgba(231, 111, 81, 0.2)), url('/src/assets/hero.png');
-  background-size: cover;
-  background-position: center;
-}
-
-.bg-sanya {
-  background: linear-gradient(135deg, rgba(42, 157, 143, 0.1), rgba(42, 157, 143, 0.2)), url('/src/assets/hero.png');
-  background-size: cover;
-  background-position: center;
-}
-
-.bg-chengdu {
-  background: linear-gradient(135deg, rgba(244, 162, 97, 0.1), rgba(244, 162, 97, 0.2)), url('/src/assets/hero.png');
-  background-size: cover;
-  background-position: center;
-}
-
-.gallery-card-content {
-  position: relative;
-  z-index: 2;
-}
-
-.gallery-card-content .city-tag {
-  display: block;
-  font-weight: 700;
-  font-size: 0.88rem;
-  color: var(--text-dark);
-}
-
-.gallery-card-content .city-desc {
+.minimalist-tag {
   display: block;
   font-size: 0.72rem;
-  color: var(--text-muted);
-  margin-top: 0.1rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: var(--primary);
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
 }
 
-.hero-form-section {
-  animation: fadeInRight 0.8s ease-out;
+.minimalist-title {
+  font-family: Georgia, Garamond, "Times New Roman", serif;
+  font-size: 3.5rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--text-dark);
+  line-height: 1.15;
+  margin-bottom: 0.8rem;
+  letter-spacing: -0.02em;
+}
+
+.minimalist-subtitle {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.minimalist-card-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.minimalist-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid var(--card-border) !important;
+  box-shadow: 0 10px 40px rgba(74, 62, 61, 0.03) !important;
+  border-radius: 20px !important;
+  padding: 2.5rem !important;
+  text-align: left;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 

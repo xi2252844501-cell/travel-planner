@@ -1579,3 +1579,277 @@ header {
   opacity: 1;
 }
 
+/* ==========================================================================
+   2026-06-08 UI Redesign & Polish Styles (Branch feature/ui-redesign)
+   ========================================================================== */
+
+/* 1. 左右分栏海报式 Hero 布局 (首屏) */
+.hero-split-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  padding: 1.5rem 0;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+@media (min-width: 992px) {
+  .hero-split-container {
+    display: grid;
+    grid-template-columns: 4.5fr 5.5fr;
+    gap: 4.5rem;
+    align-items: center;
+    padding: 3rem 0;
+  }
+}
+
+.hero-branding-section {
+  text-align: left;
+  animation: fadeInLeft 0.8s ease-out;
+}
+
+.hero-badge {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  border-radius: 30px;
+  background: var(--primary-glow);
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 1.2rem;
+  border: 1px solid rgba(231, 111, 81, 0.15);
+}
+
+.hero-title {
+  font-family: var(--font-title);
+  font-size: 2.8rem;
+  color: var(--text-dark);
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 1.5rem;
+}
+
+.hero-title br {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .hero-title br {
+    display: inline;
+  }
+}
+
+.hero-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin-bottom: 2.5rem;
+}
+
+.hero-cities-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.gallery-item {
+  border-radius: 16px;
+  height: 125px;
+  display: flex;
+  align-items: flex-end;
+  padding: 1rem;
+  border: 1px solid var(--card-border);
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition-smooth);
+  box-shadow: 0 4px 10px rgba(74, 62, 61, 0.02);
+}
+
+.gallery-item:hover {
+  transform: translateY(-4px);
+  border-color: var(--primary);
+  box-shadow: 0 8px 20px rgba(231, 111, 81, 0.1);
+}
+
+/* 渐变遮罩 */
+.gallery-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(251, 249, 244, 0) 10%, rgba(251, 249, 244, 0.95) 95%);
+  z-index: 1;
+}
+
+.bg-beijing {
+  background: linear-gradient(135deg, rgba(231, 111, 81, 0.1), rgba(231, 111, 81, 0.2)), url('/src/assets/hero.png');
+  background-size: cover;
+  background-position: center;
+}
+
+.bg-sanya {
+  background: linear-gradient(135deg, rgba(42, 157, 143, 0.1), rgba(42, 157, 143, 0.2)), url('/src/assets/hero.png');
+  background-size: cover;
+  background-position: center;
+}
+
+.bg-chengdu {
+  background: linear-gradient(135deg, rgba(244, 162, 97, 0.1), rgba(244, 162, 97, 0.2)), url('/src/assets/hero.png');
+  background-size: cover;
+  background-position: center;
+}
+
+.gallery-card-content {
+  position: relative;
+  z-index: 2;
+}
+
+.gallery-card-content .city-tag {
+  display: block;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text-dark);
+}
+
+.gallery-card-content .city-desc {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.1rem;
+}
+
+.hero-form-section {
+  animation: fadeInRight 0.8s ease-out;
+}
+
+
+/* 2. 悬浮式 App-Shell 架构 (Sticky Controls) */
+@media (min-width: 992px) {
+  .sidebar {
+    position: sticky;
+    top: 2rem;
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--card-border) transparent;
+  }
+  
+  .sidebar::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .sidebar::-webkit-scrollbar-thumb {
+    background: var(--card-border);
+    border-radius: 4px;
+  }
+}
+
+.tab-navigation {
+  position: sticky !important;
+  top: -1px;
+  z-index: 100 !important;
+  background: rgba(251, 249, 244, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid var(--card-border) !important;
+  padding: 1rem 0.5rem !important;
+  margin-bottom: 2rem !important;
+  box-shadow: 0 4px 20px rgba(74, 62, 61, 0.02);
+}
+
+/* 3. 每日日程排版与细节精致化 */
+.day-container {
+  background: #ffffff !important;
+  border: 1px solid var(--card-border) !important;
+  border-radius: 20px !important;
+  padding: 2rem !important;
+  box-shadow: 0 8px 30px rgba(74, 62, 61, 0.02) !important;
+  transition: var(--transition-smooth);
+}
+
+.day-container:hover {
+  border-color: rgba(231, 111, 81, 0.15);
+  box-shadow: 0 12px 40px rgba(74, 62, 61, 0.04) !important;
+}
+
+.spot-card {
+  border: 1px solid var(--card-border) !important;
+  border-radius: 14px !important;
+  padding: 1.5rem !important;
+  box-shadow: 0 3px 10px rgba(74, 62, 61, 0.01) !important;
+  transition: var(--transition-smooth) !important;
+}
+
+.spot-card:hover {
+  border-color: rgba(231, 111, 81, 0.3) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(231, 111, 81, 0.06) !important;
+}
+
+/* 时间轴虚线连接器 */
+.transit-connector {
+  border-left: 1.5px dashed var(--primary) !important;
+  padding: 0.8rem 1.8rem !important;
+  margin: 0.5rem 0 0.5rem 1.8rem !important;
+  position: relative;
+}
+
+/* 虚线连接器两端的小箭头装饰 */
+.transit-connector::before {
+  content: '↓';
+  position: absolute;
+  left: -5.5px;
+  top: 45%;
+  font-size: 0.7rem;
+  color: var(--primary);
+  font-weight: bold;
+}
+
+/* 4. 住宿卡片及比价条排版优化 */
+.hotel-card {
+  border: 1px solid var(--card-border) !important;
+  border-radius: 16px !important;
+  padding: 1.5rem !important;
+  box-shadow: 0 4px 15px rgba(74, 62, 61, 0.02) !important;
+  transition: var(--transition-smooth) !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hotel-card:hover {
+  border-color: rgba(231, 111, 81, 0.3) !important;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(231, 111, 81, 0.08) !important;
+}
+
+.ota-compare {
+  display: flex !important;
+  justify-content: space-between !important;
+  gap: 0.4rem !important;
+  background: rgba(235, 220, 208, 0.25) !important;
+  border-radius: 30px !important;
+  padding: 0.4rem 0.8rem !important;
+  font-size: 0.72rem !important;
+  color: var(--text-main) !important;
+  border: 1px solid rgba(235, 220, 208, 0.4) !important;
+  margin-bottom: 1rem !important;
+}
+
+.ota-compare span {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.ota-compare b {
+  color: var(--primary);
+  font-weight: 700;
+}
+

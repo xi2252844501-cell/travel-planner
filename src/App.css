@@ -1,7 +1,7 @@
 /* RoamPlanner - Premium Forest Green & Gold Style Theme */
 
 :root {
-  --bg-color: #FDFBF9; /* 优雅温润沙滩米白 */
+  --bg-color: #F5F2EB; /* 优雅温润沙滩米白 */
   --card-bg: #ffffff;
   --card-border: rgba(45, 78, 63, 0.05); /* 极其轻薄的深绿淡化边框 */
   --text-main: #3D3532; /* 暖炭灰 */
@@ -2100,7 +2100,7 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 1.2rem 2.5rem;
-  background: #FDFBF9;
+  background: var(--bg-color);
   border-bottom: 1px solid var(--card-border);
   position: sticky;
   top: 0;

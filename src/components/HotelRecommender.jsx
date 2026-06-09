@@ -327,7 +327,7 @@ export default function HotelRecommender({
               </button>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '0.8rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
+          <div className="hotel-nights-list" style={{ display: 'flex', gap: '0.8rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
             {selectedHotels.map((hotel, index) => {
               const isActive = activeNightIndex === index;
               return (

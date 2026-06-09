@@ -2772,4 +2772,229 @@ header {
   background: transparent;
 }
 
+/* ==========================================================================
+   Mobile Devices Polish & Responsiveness Patch (Max-width: 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* Prevent horizontal scrolling & set container padding */
+  body, html {
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
+
+  .app-container {
+    padding: 0.75rem 0.5rem 2.5rem 0.5rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Reset App Header to fit nicely on one row without breaking out */
+  .app-header {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-top: -0.75rem !important;
+    margin-bottom: 1rem !important;
+    padding: 0.8rem 0.75rem !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    border-radius: 0 0 12px 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  .logo-container {
+    gap: 0.4rem !important;
+  }
+  
+  .logo-badge {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  
+  .logo-badge svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  .logo-text {
+    font-size: 1.05rem !important;
+  }
+
+  .nav-link-back-header {
+    font-size: 0.72rem !important;
+    padding: 0.35rem 0.75rem !important;
+    border-radius: 15px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Dashboard layout card spacing */
+  .dashboard-grid {
+    gap: 1.2rem !important;
+    width: 100% !important;
+  }
+
+  .glass-card {
+    padding: 1rem !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Tab Navigation Stepper mobile polish */
+  .tab-navigation {
+    margin-top: -1rem !important;
+    margin-left: -1rem !important;
+    margin-right: -1rem !important;
+    padding: 0.8rem 0.8rem !important;
+    border-radius: 12px 12px 0 0 !important;
+    gap: 0.8rem !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    display: flex !important;
+    justify-content: flex-start !important; /* Allow scroll */
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important; /* Hide scrollbar Firefox */
+    -ms-overflow-style: none !important; /* Hide scrollbar IE 10+ */
+  }
+
+  .tab-navigation::-webkit-scrollbar {
+    display: none !important; /* Hide scrollbar Chrome/Safari */
+  }
+
+  /* Hide scrollbar for hotel nights selector list on mobile */
+  .hotel-nights-list {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  .hotel-nights-list::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .stepper-progress-line {
+    display: none !important; /* Hide line since stepper scrolls */
+  }
+
+  .stepper-node {
+    flex-shrink: 0 !important;
+    gap: 0.3rem !important;
+  }
+
+  .step-circle {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.75rem !important;
+  }
+
+  .step-circle svg {
+    width: 11px !important;
+    height: 11px !important;
+  }
+
+  .step-label {
+    font-size: 0.78rem !important;
+  }
+
+  /* Packing list responsive styling */
+  .packing-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+
+  .packing-sidebar {
+    position: relative !important;
+    top: 0 !important;
+  }
+
+  /* Timeline mobile layout padding & day badge alignment */
+  .timeline-wrapper {
+    padding-left: 2rem !important;
+  }
+
+  .timeline-line {
+    left: 11px !important;
+  }
+
+  .timeline-day-badge {
+    left: -37px !important; /* Perfectly centered on 11px line */
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 0.8rem !important;
+    line-height: 29px !important;
+  }
+
+  .timeline-day-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.4rem !important;
+  }
+
+  .timeline-day-header .subtitle {
+    font-size: 0.75rem !important;
+    padding: 0.15rem 0.4rem !important;
+  }
+
+  .timeline-day-title-input {
+    font-size: 1.15rem !important;
+    width: 100% !important;
+  }
+
+  /* Spot card layout (Compact list) */
+  .spot-card {
+    padding: 0.8rem !important;
+    border-radius: 12px !important;
+  }
+
+  .spot-card-main-content {
+    flex-direction: column !important;
+    gap: 0.8rem !important;
+  }
+
+  .spot-card-thumbnail-wrapper {
+    width: 100% !important;
+    height: 140px !important;
+  }
+
+  .spot-card-details {
+    width: 100% !important;
+  }
+
+  .spot-card-details .header .title {
+    font-size: 1.1rem !important;
+  }
+
+  .spot-card-details .meta {
+    flex-wrap: wrap !important;
+    gap: 0.3rem !important;
+  }
+
+  .spot-card-details .meta .tag {
+    font-size: 0.7rem !important;
+    padding: 0.15rem 0.4rem !important;
+  }
+
+  .spot-card-details .desc {
+    font-size: 0.78rem !important;
+  }
+
+  /* Slide-out attraction library drawer */
+  .pool-drawer {
+    width: 90% !important;
+    max-width: 330px !important;
+    z-index: 1050 !important;
+    padding: 1rem !important;
+  }
+
+  /* Modals */
+  .modal-container {
+    width: 95% !important;
+    padding: 1rem !important;
+    max-height: 90vh !important;
+  }
+}
+
+
 

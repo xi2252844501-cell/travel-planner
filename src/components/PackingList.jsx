@@ -79,7 +79,7 @@ export default function PackingList({
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem', alignItems: 'start' }}>
+      <div className="packing-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem', alignItems: 'start' }}>
         {/* 左侧：分类必带物品展示 */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {defaultCategories.map((cat, cIdx) => (
@@ -146,6 +146,7 @@ export default function PackingList({
 
         {/* 右侧：自定义随身清单 */}
         <div
+          className="packing-sidebar"
           style={{
             background: '#ffffff',
             border: '1.5px dashed var(--card-border)',
@@ -163,7 +164,7 @@ export default function PackingList({
             <input
               type="text"
               className="custom-input"
-              style={{ padding: '0.5rem 0.8rem', fontSize: '0.85rem', borderRadius: '8px' }}
+              style={{ padding: '0.5rem 0.8rem', fontSize: '0.85rem', borderRadius: '8px', flex: 1, width: '100%' }}
               placeholder="添加防晒霜、照相机等..."
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { attractionsData, itineraryTemplates } from '../data/travelData';
 import { getTransitAdvice as getTransitAdviceApi } from '../utils/transitRouter';
+import { getAttractionImage } from '../utils/imageMapper';
 
 export default function ItineraryBuilder({
   config,
@@ -107,7 +108,7 @@ export default function ItineraryBuilder({
             onClick={handleClearAll}
             style={{
               background: 'none',
-              border: '1.5px solid var(--danger)',
+              border: '1.5px solid rgba(201, 74, 41, 0.25)',
               color: 'var(--danger)',
               borderRadius: '10px',
               padding: '0.6rem 1.2rem',
@@ -118,80 +119,58 @@ export default function ItineraryBuilder({
               boxShadow: 'none',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.3rem'
+              gap: '0.4rem'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = 'var(--danger)';
               e.currentTarget.style.color = '#fff';
+              e.currentTarget.style.borderColor = 'var(--danger)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = 'none';
               e.currentTarget.style.color = 'var(--danger)';
+              e.currentTarget.style.borderColor = 'rgba(201, 74, 41, 0.25)';
             }}
           >
-            🗑️ 一键清空日程
-          </button>
-          <button className="btn-primary" onClick={handleLoadTemplate} style={{ width: 'auto', marginTop: 0, padding: '0.6rem 1.2rem', fontSize: '0.9rem', background: 'linear-gradient(135deg, #0ea5e9, #10b981)' }}>
-            🎒 导入经典路线模板
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+            一键清空日程
           </button>
           <button
-            className="btn-primary"
+            className="workbench-action-btn"
+            onClick={handleLoadTemplate}
+          >
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+            导入经典路线模板
+          </button>
+          <button
+            className="workbench-action-btn"
             onClick={() => onAutoRecommendHotels(itinerary, false)}
-            style={{
-              width: 'auto',
-              marginTop: 0,
-              padding: '0.6rem 1.2rem',
-              fontSize: '0.9rem',
-              fontWeight: '600',
-              cursor: 'pointer',
-              background: 'linear-gradient(135deg, var(--secondary), #207a70)',
-              boxShadow: '0 2px 8px rgba(42, 157, 143, 0.2)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.3rem'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(42, 157, 143, 0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'none';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(42, 157, 143, 0.2)';
-            }}
           >
-            🏠 一键推荐住宿
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            一键推荐住宿
           </button>
           <button
-            className="btn-primary"
+            className={`workbench-action-btn ${isPoolOpen ? 'active' : ''}`}
             onClick={() => setIsPoolOpen(!isPoolOpen)}
-            style={{
-              width: 'auto',
-              marginTop: 0,
-              padding: '0.6rem 1.2rem',
-              fontSize: '0.9rem',
-              fontWeight: '600',
-              cursor: 'pointer',
-              background: isPoolOpen ? 'var(--text-muted)' : 'linear-gradient(135deg, var(--primary), var(--warning))',
-              boxShadow: '0 2px 8px rgba(231, 111, 81, 0.2)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.3rem',
-              transition: 'var(--transition-smooth)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              if (!isPoolOpen) {
-                e.currentTarget.style.boxShadow = '0 4px 15px rgba(231, 111, 81, 0.3)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'none';
-              if (!isPoolOpen) {
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(231, 111, 81, 0.2)';
-              }
-            }}
           >
-            💡 {isPoolOpen ? '收起景点库' : '展开景点库'}
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            {isPoolOpen ? '收起景点库' : '展开景点库'}
           </button>
         </div>
       </div>
@@ -199,8 +178,8 @@ export default function ItineraryBuilder({
       {/* 智能住宿推荐入口横幅：当用户已规划景点但还没有任何已选酒店时显示 */}
       {itinerary.some(day => day.spotIds.length > 0) && (!selectedHotels || !selectedHotels.some(h => h !== null)) && (
         <div style={{
-          background: 'rgba(42, 157, 143, 0.08)',
-          border: '1.5px solid rgba(42, 157, 143, 0.25)',
+          background: 'rgba(45, 78, 63, 0.04)',
+          border: '1.5px solid rgba(45, 78, 63, 0.12)',
           borderRadius: '16px',
           padding: '1rem 1.5rem',
           marginBottom: '1.5rem',
@@ -209,13 +188,13 @@ export default function ItineraryBuilder({
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '1rem',
-          boxShadow: '0 4px 12px rgba(42, 157, 143, 0.05)',
+          boxShadow: '0 4px 12px rgba(45, 78, 63, 0.02)',
           animation: 'fadeInDown 0.5s ease-out'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
             <span style={{ fontSize: '1.6rem' }}>🧭</span>
             <div>
-              <h5 style={{ color: 'var(--secondary)', margin: 0, fontSize: '0.98rem', fontWeight: 'bold', fontFamily: 'var(--font-sans)' }}>
+              <h5 style={{ color: 'var(--primary)', margin: 0, fontSize: '0.98rem', fontWeight: 'bold', fontFamily: 'var(--font-sans)' }}>
                 智能住宿推荐助手
               </h5>
               <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.82rem', marginTop: '0.2rem' }}>
@@ -226,7 +205,7 @@ export default function ItineraryBuilder({
           <button
             onClick={() => onAutoRecommendHotels(itinerary, false)}
             style={{
-              background: 'linear-gradient(135deg, var(--secondary), #207a70)',
+              background: 'var(--primary)',
               border: 'none',
               color: '#ffffff',
               borderRadius: '10px',
@@ -234,180 +213,193 @@ export default function ItineraryBuilder({
               fontSize: '0.85rem',
               fontWeight: '600',
               cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(42, 157, 143, 0.2)',
+              boxShadow: '0 2px 8px rgba(45, 78, 63, 0.15)',
               whiteSpace: 'nowrap',
               transition: 'var(--transition-smooth)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(42, 157, 143, 0.3)';
+              e.currentTarget.style.background = '#1e362b';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(45, 78, 63, 0.25)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'none';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(42, 157, 143, 0.2)';
+              e.currentTarget.style.background = 'var(--primary)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(45, 78, 63, 0.15)';
             }}
           >
-            ✨ 一键生成推荐住宿
+            ✨ 一键智能推荐住宿
           </button>
         </div>
       )}
 
       <div className="builder-layout">
         {/* 左侧：每日行程时间轴 */}
-        <div className="timeline-column">
-          {itinerary.map((day, dIdx) => {
-            const hasSpots = day.spotIds.length > 0;
-            return (
-              <div className="day-container" key={`day-${day.day}`}>
-                <div className="day-header">
-                  <div>
-                    <h3>Day {day.day}</h3>
-                    <input
-                      type="text"
-                      value={day.title}
-                      onChange={(e) => {
-                        const updated = [...itinerary];
-                        updated[dIdx].title = e.target.value;
-                        onChangeItinerary(updated);
-                      }}
-                      style={{ background: 'none', border: 'none', borderBottom: '1px dashed var(--card-border)', color: 'var(--text-muted)', fontSize: '0.85rem', width: '220px', padding: '0.1rem 0', outline: 'none' }}
-                      placeholder="修改这一天的主题..."
-                    />
+        <div className="timeline-wrapper">
+          <div className="timeline-line" />
+          <div className="timeline-column">
+            {itinerary.map((day, dIdx) => {
+              const hasSpots = day.spotIds.length > 0;
+              return (
+                <div className="timeline-day-section" key={`day-${day.day}`}>
+                  <div className="timeline-day-badge">D{day.day}</div>
+                  
+                  <div className="timeline-day-header">
+                    <div>
+                      <input
+                        type="text"
+                        value={day.title}
+                        onChange={(e) => {
+                          const updated = [...itinerary];
+                          updated[dIdx].title = e.target.value;
+                          onChangeItinerary(updated);
+                        }}
+                        className="timeline-day-title-input"
+                        placeholder="修改这一天的主题..."
+                      />
+                    </div>
+                    <span className="subtitle">共 {day.spotIds.length} 个打卡点</span>
                   </div>
-                  <span className="subtitle">共 {day.spotIds.length} 个打卡点</span>
-                </div>
 
-                <div className="day-spots">
-                  {hasSpots ? (
-                    day.spotIds.map((spotId, sIdx) => {
-                      const spot = attractions.find(s => s.id === spotId);
-                      if (!spot) return null;
+                  <div className="timeline-day-spots">
+                    {hasSpots ? (
+                      day.spotIds.map((spotId, sIdx) => {
+                        const spot = attractions.find(s => s.id === spotId);
+                        if (!spot) return null;
 
-                      // 计算到下一个景点的交通建议
-                      const nextSpotId = day.spotIds[sIdx + 1];
-                      const transit = nextSpotId ? getTransitAdvice(spotId, nextSpotId) : null;
-                      const isExpanded = expandedSpotId === `${day.day}_${spotId}`;
+                        // 计算到下一个景点的交通建议
+                        const nextSpotId = day.spotIds[sIdx + 1];
+                        const transit = nextSpotId ? getTransitAdvice(spotId, nextSpotId) : null;
+                        const isExpanded = expandedSpotId === `${day.day}_${spotId}`;
+                        const imageUrl = getAttractionImage(spot.id, destination);
 
-                      return (
-                        <React.Fragment key={`day-${day.day}-spot-${spotId}`}>
-                          <div className="spot-card">
-                            <div className="header">
-                              <div
-                                className="title"
-                                onClick={() => {
-                                  setExpandedSpotId(isExpanded ? null : `${day.day}_${spotId}`);
-                                  setGuideTab('photo');
-                                }}
-                              >
-                                {spot.name}
-                                <span style={{ fontSize: '0.75rem', color: '#10b981', marginLeft: '0.6rem', background: 'rgba(16,185,129,0.1)', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
-                                  ⭐ {spot.socialHotRating}
-                                </span>
-                              </div>
-                              <button
-                                className="remove-btn"
-                                onClick={() => handleRemoveSpot(spotId, day.day)}
-                                title="从行程中移除"
-                              >
-                                ✕
-                              </button>
-                            </div>
-                            <div className="meta">
-                              <span className="tag primary">{spot.area}</span>
-                              <span className="tag warning">门票: {spot.ticketPrice === 0 ? '免费' : `¥${spot.ticketPrice}`}</span>
-                              <span className="tag">玩 {spot.playTime}</span>
-                            </div>
-                            <p className="desc">{spot.description}</p>
-
-                            {/* 景点折叠指南 (小红书/抖音风) */}
-                            {isExpanded && (
-                              <div style={{ marginTop: '1rem', borderTop: '1px solid var(--card-border)', paddingTop: '0.8rem' }}>
-                                <div className="guide-tabs">
-                                  <button
-                                    className={`guide-tab ${guideTab === 'photo' ? 'active' : ''}`}
-                                    onClick={() => setGuideTab('photo')}
-                                  >
-                                    📸 小红书机位
-                                  </button>
-                                  <button
-                                    className={`guide-tab ${guideTab === 'food' ? 'active' : ''}`}
-                                    onClick={() => setGuideTab('food')}
-                                  >
-                                    🍤 附近美食
-                                  </button>
-                                  <button
-                                    className={`guide-tab ${guideTab === 'activities' ? 'active' : ''}`}
-                                    onClick={() => setGuideTab('activities')}
-                                  >
-                                    ⛵ 游玩项目
-                                  </button>
+                        return (
+                          <React.Fragment key={`day-${day.day}-spot-${spotId}`}>
+                            <div className="spot-card">
+                              <div className="spot-card-main-content">
+                                <div className="spot-card-thumbnail-wrapper" onClick={() => setExpandedSpotId(isExpanded ? null : `${day.day}_${spotId}`)}>
+                                  <img src={imageUrl} alt={spot.name} className="spot-card-thumbnail" loading="lazy" />
                                 </div>
-
-                                <div className="guide-content">
-                                  {guideTab === 'photo' && spot.guide.photoSpots.map((item, idx) => (
-                                    <div className="guide-item" key={`photo-${idx}`}>
-                                      <div className="title">📍 {item.location}</div>
-                                      <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{item.tip}</p>
+                                <div className="spot-card-details">
+                                  <div className="header">
+                                    <div
+                                      className="title"
+                                      onClick={() => {
+                                        setExpandedSpotId(isExpanded ? null : `${day.day}_${spotId}`);
+                                        setGuideTab('photo');
+                                      }}
+                                    >
+                                      {spot.name}
                                     </div>
-                                  ))}
+                                    <button
+                                      className="remove-btn"
+                                      onClick={() => handleRemoveSpot(spotId, day.day)}
+                                      title="从行程中移除"
+                                    >
+                                      ✕
+                                    </button>
+                                  </div>
+                                  <div className="meta">
+                                    <span className="tag tag-rating">⭐ {spot.socialHotRating}</span>
+                                    <span className="tag tag-area">{spot.area}</span>
+                                    <span className="tag tag-price">门票: {spot.ticketPrice === 0 ? '免费' : `¥${spot.ticketPrice}`}</span>
+                                    <span className="tag tag-time">🕒 {spot.playTime}</span>
+                                  </div>
+                                  <p className="desc">{spot.description}</p>
+                                </div>
+                              </div>
 
-                                  {guideTab === 'food' && spot.guide.food.map((item, idx) => (
-                                    <div className="guide-item" key={`food-${idx}`} style={{ borderLeftColor: '#f59e0b' }}>
-                                      <div className="title" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <span>🍲 {item.name}</span>
-                                        <span style={{ color: '#f59e0b', fontSize: '0.8rem' }}>人均 ¥{item.perCapita}</span>
+                              {/* 景点折叠指南 (小红书/抖音风) */}
+                              {isExpanded && (
+                                <div style={{ marginTop: '1rem', borderTop: '1px solid var(--card-border)', paddingTop: '0.8rem' }}>
+                                  <div className="guide-tabs">
+                                    <button
+                                      className={`guide-tab ${guideTab === 'photo' ? 'active' : ''}`}
+                                      onClick={() => setGuideTab('photo')}
+                                    >
+                                      📸 小红书机位
+                                    </button>
+                                    <button
+                                      className={`guide-tab ${guideTab === 'food' ? 'active' : ''}`}
+                                      onClick={() => setGuideTab('food')}
+                                    >
+                                      🍤 附近美食
+                                    </button>
+                                    <button
+                                      className={`guide-tab ${guideTab === 'activities' ? 'active' : ''}`}
+                                      onClick={() => setGuideTab('activities')}
+                                    >
+                                      ⛵ 游玩项目
+                                    </button>
+                                  </div>
+
+                                  <div className="guide-content">
+                                    {guideTab === 'photo' && spot.guide.photoSpots.map((item, idx) => (
+                                      <div className="guide-item" key={`photo-${idx}`}>
+                                        <div className="title">📍 {item.location}</div>
+                                        <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{item.tip}</p>
                                       </div>
-                                      <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>推荐: {item.recommend}</p>
-                                    </div>
-                                  ))}
+                                    ))}
 
-                                  {guideTab === 'activities' && (
-                                    <div>
-                                      {spot.guide.activities.free.map((item, idx) => (
-                                        <div className="guide-item" key={`act-free-${idx}`} style={{ borderLeftColor: '#10b981' }}>
-                                          <div className="title">🏖️ 免费体验</div>
-                                          <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{item}</p>
+                                    {guideTab === 'food' && spot.guide.food.map((item, idx) => (
+                                      <div className="guide-item" key={`food-${idx}`} style={{ borderLeftColor: '#f59e0b' }}>
+                                        <div className="title" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                          <span>🍲 {item.name}</span>
+                                          <span style={{ color: '#f59e0b', fontSize: '0.8rem' }}>人均 ¥{item.perCapita}</span>
                                         </div>
-                                      ))}
-                                      {spot.guide.activities.paid.map((item, idx) => (
-                                        <div className="guide-item" key={`act-paid-${idx}`} style={{ borderLeftColor: '#ef4444' }}>
-                                          <div className="title" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                            <span>⛵ 收费项目: {item.project}</span>
-                                            <span style={{ color: '#ef4444', fontSize: '0.8rem' }}>{item.price}</span>
+                                        <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>推荐: {item.recommend}</p>
+                                      </div>
+                                    ))}
+
+                                    {guideTab === 'activities' && (
+                                      <div>
+                                        {spot.guide.activities.free.map((item, idx) => (
+                                          <div className="guide-item" key={`act-free-${idx}`} style={{ borderLeftColor: '#10b981' }}>
+                                            <div className="title">🏖️ 免费体验</div>
+                                            <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{item}</p>
                                           </div>
-                                          <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>⚠️ 避坑: {item.tip}</p>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
+                                        ))}
+                                        {spot.guide.activities.paid.map((item, idx) => (
+                                          <div className="guide-item" key={`act-paid-${idx}`} style={{ borderLeftColor: '#ef4444' }}>
+                                            <div className="title" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                              <span>⛵ 收费项目: {item.project}</span>
+                                              <span style={{ color: '#ef4444', fontSize: '0.8rem' }}>{item.price}</span>
+                                            </div>
+                                            <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>⚠️ 避坑: {item.tip}</p>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* 景点间交通连接器 */}
+                            {transit && (
+                              <div className="timeline-transit-connector">
+                                <span className="icon">{transit.icon}</span>
+                                <div className="transit-details">
+                                  <strong>交通推荐：{transit.text}</strong>
+                                  {transit.tip && <span className="tip">{transit.tip}</span>}
                                 </div>
                               </div>
                             )}
-                          </div>
-
-                          {/* 景点间交通连接器 */}
-                          {transit && (
-                            <div className="transit-connector">
-                              <span className="icon">{transit.icon}</span>
-                              <div>
-                                <strong>交通推荐：</strong>
-                                <span>{transit.text}</span>
-                                <div className="tip">{transit.tip}</div>
-                              </div>
-                            </div>
-                          )}
-                        </React.Fragment>
-                      );
-                    })
-                  ) : (
-                    <div style={{ textAlign: 'center', padding: '2rem 1rem', border: '1.5px dashed var(--card-border)', borderRadius: '12px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                      还没有添加景点，点击右上角“💡 展开景点库”来定制你的日程吧 ✨
-                    </div>
-                  )}
+                          </React.Fragment>
+                        );
+                      })
+                    ) : (
+                      <div 
+                        className="timeline-empty-state"
+                        onClick={() => setIsPoolOpen(true)}
+                        title="点击展开景点库"
+                      >
+                        暂无日程安排 · 点击此处或右上角“展开景点库”定制精彩行程
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -430,23 +422,28 @@ export default function ItineraryBuilder({
         <div className="pool-list">
           {attractions.map(spot => (
             <div className="pool-item" key={`pool-${spot.id}`}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.3rem' }}>
+              <div className="pool-item-header">
                 <div className="title">{spot.name}</div>
-                <span style={{ fontSize: '0.75rem', color: '#f59e0b' }}>🔥 {spot.socialHotRating}</span>
+                <span className="pool-item-rating">🔥 {spot.socialHotRating}</span>
               </div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem', lineHeight: '1.3' }}>
+              <div className="pool-item-desc">
                 {spot.description}
               </div>
-              <div className="meta-row">
-                <span>¥{spot.ticketPrice === 0 ? '免费' : spot.ticketPrice} | {spot.playTime}</span>
-                <div style={{ display: 'flex', gap: '0.3rem' }}>
+              <div className="pool-item-meta">
+                <span className="pool-meta-tag">¥{spot.ticketPrice === 0 ? '免费' : spot.ticketPrice}</span>
+                <span className="pool-meta-divider">•</span>
+                <span className="pool-meta-tag">🕒 {spot.playTime}</span>
+              </div>
+              <div className="pool-item-actions">
+                <span className="actions-label">添加到日程:</span>
+                <div className="day-add-buttons">
                   {Array.from({ length: days }, (_, i) => i + 1).map(dayNum => (
                     <button
                       key={`add-to-d-${dayNum}`}
-                      className="add-btn"
+                      className="pool-day-add-btn"
                       onClick={() => handleAddSpot(spot.id, dayNum)}
                     >
-                      +D{dayNum}
+                      D{dayNum}
                     </button>
                   ))}
                 </div>
@@ -512,15 +509,15 @@ export default function ItineraryBuilder({
 
                       {/* Day-by-Day schedule preview */}
                       <div className="template-schedule-preview">
-                        <strong style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem' }}>
+                        <strong style={{ fontSize: '0.82rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.6rem' }}>
                           📅 路线概览：
                         </strong>
                         {tpl.schedule.map((schDay) => (
                           <div className="template-preview-day" key={`tpl-${index}-d-${schDay.day}`}>
-                            <span style={{ fontWeight: '600', color: 'var(--primary)', marginRight: '0.4rem' }}>
-                              D{schDay.day}:
+                            <span className="template-day-tag">
+                              D{schDay.day}
                             </span>
-                            <span style={{ fontWeight: '500', color: 'var(--text-dark)' }}>{schDay.title}</span>
+                            <span style={{ fontWeight: '600', color: 'var(--text-dark)' }}>{schDay.title}</span>
                             {schDay.spotIds && schDay.spotIds.length > 0 && (
                               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>
                                 ({getSpotNames(schDay.spotIds)})
@@ -532,17 +529,10 @@ export default function ItineraryBuilder({
 
                       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                         <button 
-                          className="btn-primary" 
+                          className="template-apply-btn" 
                           onClick={(e) => {
                             e.stopPropagation();
                             handleApplyTemplate(tpl);
-                          }}
-                          style={{
-                            width: 'auto',
-                            margin: 0,
-                            padding: '0.5rem 1.2rem',
-                            fontSize: '0.85rem',
-                            background: 'linear-gradient(135deg, var(--primary), var(--warning))'
                           }}
                         >
                           应用此路线模板

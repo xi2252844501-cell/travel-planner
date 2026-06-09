@@ -170,14 +170,28 @@ export default function PackingList({
             />
             <button
               type="submit"
-              className="btn-primary"
               style={{
                 width: 'auto',
                 marginTop: 0,
-                padding: '0.5rem 1rem',
+                padding: '0.55rem 1.4rem',
                 fontSize: '0.85rem',
-                borderRadius: '8px',
-                whiteSpace: 'nowrap'
+                fontWeight: '600',
+                background: 'var(--primary)',
+                color: '#ffffff',
+                border: '1.2px solid rgba(45, 78, 63, 0.15)',
+                borderRadius: '30px',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                transition: 'var(--transition-smooth)',
+                boxShadow: '0 4px 12px rgba(45, 78, 63, 0.1)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--secondary)';
+                e.currentTarget.style.color = 'var(--primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'var(--primary)';
+                e.currentTarget.style.color = '#ffffff';
               }}
             >
               添加

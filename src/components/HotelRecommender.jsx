@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { hotelsData, attractionsData } from '../data/travelData';
+import { getHotelImage } from '../utils/imageMapper';
 
 export default function HotelRecommender({
   config,
@@ -21,6 +22,10 @@ export default function HotelRecommender({
   const [selectedPriceRange, setSelectedPriceRange] = useState('All');
   // 各酒店卡片中“避坑与反馈贴士”的折叠状态 (key 为 hotel.id)
   const [expandedComments, setExpandedComments] = useState({});
+  // 筛选面板折叠状态 (默认为收起，保持界面清爽)
+  const [isFilterCollapsed, setIsFilterCollapsed] = useState(true);
+  // 酒店名称搜索状态
+  const [searchQuery, setSearchQuery] = useState('');
 
   const toggleCommentExpand = (hotelId) => {
     setExpandedComments(prev => ({
@@ -161,7 +166,9 @@ export default function HotelRecommender({
       const maxTolerablePrice = Math.max((budget - attractionsCost) / nights, 0);
       priceMatch = h.price <= maxTolerablePrice;
     }
-    return areaMatch && priceMatch;
+    // 3. 搜索过滤
+    const searchMatch = !searchQuery.trim() || h.name.toLowerCase().includes(searchQuery.toLowerCase().trim());
+    return areaMatch && priceMatch && searchMatch;
   });
 
   // 一键智能匹配全程酒店住宿
@@ -193,162 +200,230 @@ export default function HotelRecommender({
         </div>
       </div>
 
-      {/* 2. 每日住宿概览（时间线模式） */}
-      <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem', flexWrap: 'wrap', gap: '0.8rem' }}>
-          <h3 style={{ fontFamily: 'var(--font-title)', fontSize: '1.4rem', color: 'var(--text-dark)', margin: 0 }}>
-            🏨 安排你的住宿日程（共 {nights} 晚）
-          </h3>
-          <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <button
-              onClick={handleAutoRecommendAll}
-              style={{
-                background: 'linear-gradient(135deg, var(--secondary), #207a70)',
-                border: 'none',
-                color: '#ffffff',
-                borderRadius: '10px',
-                padding: '0.5rem 1rem',
-                fontSize: '0.85rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'var(--transition-smooth)',
-                boxShadow: '0 2px 8px rgba(42, 157, 143, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.3rem'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = '0 4px 15px rgba(42, 157, 143, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'none';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(42, 157, 143, 0.2)';
-              }}
-            >
-              ✨ 一键智能推荐住宿
-            </button>
-            <button
-              onClick={handleClearAllHotels}
-              style={{
-                background: 'none',
-                border: '1.5px solid var(--danger)',
-                color: 'var(--danger)',
-                borderRadius: '10px',
-                padding: '0.5rem 1rem',
-                fontSize: '0.85rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'var(--transition-smooth)',
-                boxShadow: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.3rem'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'var(--danger)';
-                e.currentTarget.style.color = '#fff';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'none';
-                e.currentTarget.style.color = 'var(--danger)';
-              }}
-            >
-              🗑️ 一键清空住宿
-            </button>
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: '0.8rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
-          {selectedHotels.map((hotel, index) => {
-            const isActive = activeNightIndex === index;
-            return (
-              <div
-                key={`night-${index}`}
-                onClick={() => setActiveNightIndex(index)}
+      {/* 2. 每日住宿概览与筛选过滤器 (悬浮固化面板) */}
+      <div className="hotel-sticky-panel no-print">
+        {/* 住宿时间线 */}
+        <div className="hotel-timeline-section">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem', flexWrap: 'wrap', gap: '0.8rem' }}>
+            <h3 style={{ fontFamily: 'var(--font-title)', fontSize: '1.4rem', color: 'var(--text-dark)', margin: 0 }}>
+              🏨 安排你的住宿日程
+              <span style={{ fontFamily: 'var(--font-sans)', fontSize: '1.1rem', fontWeight: '600', color: 'var(--text-muted)', marginLeft: '0.4rem', verticalAlign: 'middle' }}>
+                （共 {nights} 晚）
+              </span>
+            </h3>
+            <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap' }}>
+              {/* 🔍 搜索酒店框 */}
+              <div className="hotel-search-wrapper" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input
+                  type="text"
+                  placeholder="搜索酒店名称..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="hotel-search-input"
+                  style={{
+                    padding: '0.45rem 1rem 0.45rem 2.2rem',
+                    fontSize: '0.82rem',
+                    borderRadius: '30px',
+                    border: '1.2px solid rgba(45, 78, 63, 0.15)',
+                    outline: 'none',
+                    width: '165px',
+                    transition: 'var(--transition-smooth)',
+                    background: '#ffffff',
+                    fontFamily: 'var(--font-sans)',
+                  }}
+                />
+                <svg
+                  viewBox="0 0 24 24"
+                  width="13"
+                  height="13"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{
+                    position: 'absolute',
+                    left: '0.9rem',
+                    color: 'var(--text-muted)'
+                  }}
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    style={{
+                      position: 'absolute',
+                      right: '0.8rem',
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--text-muted)',
+                      cursor: 'pointer',
+                      fontSize: '0.85rem',
+                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    title="清空搜索"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              <button
+                onClick={handleAutoRecommendAll}
+                className="workbench-action-btn"
+              >
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                一键智能推荐住宿
+              </button>
+              <button
+                onClick={handleClearAllHotels}
                 style={{
-                  background: isActive ? 'var(--primary-glow)' : 'rgba(255,255,255,0.02)',
-                  border: isActive ? '1px solid var(--primary)' : '1px solid var(--card-border)',
-                  borderRadius: '10px',
-                  padding: '0.8rem 1.2rem',
-                  minWidth: '160px',
+                  background: 'none',
+                  border: '1.2px solid rgba(201, 74, 41, 0.25)',
+                  color: 'var(--danger)',
+                  borderRadius: '30px',
+                  padding: '0.55rem 1.2rem',
+                  fontSize: '0.82rem',
+                  fontWeight: '600',
                   cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'var(--transition-smooth)'
+                  transition: 'var(--transition-smooth)',
+                  boxShadow: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--danger)';
+                  e.currentTarget.style.color = '#fff';
+                  e.currentTarget.style.borderColor = 'var(--danger)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'none';
+                  e.currentTarget.style.color = 'var(--danger)';
+                  e.currentTarget.style.borderColor = 'rgba(201, 74, 41, 0.25)';
                 }}
               >
-                <div style={{ fontSize: '0.75rem', color: isActive ? 'var(--primary)' : 'var(--text-muted)', fontWeight: 'bold' }}>
-                  第 {index + 1} 晚住宿 {isActive && '👉'}
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+                一键清空住宿
+              </button>
+              <button
+                onClick={() => setIsFilterCollapsed(!isFilterCollapsed)}
+                className={`workbench-action-btn toggle-filter-btn ${isFilterCollapsed ? '' : 'expanded'}`}
+              >
+                {isFilterCollapsed ? '展开筛选 ▾' : '收起筛选 ▴'}
+              </button>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '0.8rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
+            {selectedHotels.map((hotel, index) => {
+              const isActive = activeNightIndex === index;
+              return (
+                <div
+                  key={`night-${index}`}
+                  onClick={() => setActiveNightIndex(index)}
+                  style={{
+                    background: isActive ? 'var(--primary-glow)' : 'rgba(255,255,255,0.02)',
+                    border: isActive ? '1px solid var(--primary)' : '1px solid var(--card-border)',
+                    borderRadius: '10px',
+                    padding: '0.8rem 1.2rem',
+                    minWidth: '160px',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'var(--transition-smooth)'
+                  }}
+                >
+                  <div style={{ fontSize: '0.75rem', color: isActive ? 'var(--primary)' : 'var(--text-muted)', fontWeight: 'bold' }}>
+                    第 {index + 1} 晚住宿 {isActive && '👉'}
+                  </div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 'bold', color: hotel ? 'var(--text-dark)' : 'var(--danger)', marginTop: '0.2rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {hotel ? hotel.name : '未选择酒店'}
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--secondary)', marginTop: '0.1rem' }}>
+                    {hotel ? `¥${hotel.price}/晚` : '-'}
+                  </div>
                 </div>
-                <div style={{ fontSize: '0.9rem', fontWeight: 'bold', color: hotel ? 'var(--text-dark)' : 'var(--danger)', marginTop: '0.2rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {hotel ? hotel.name : '未选择酒店'}
-                </div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--secondary)', marginTop: '0.1rem' }}>
-                  {hotel ? `¥${hotel.price}/晚` : '-'}
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 筛选过滤 */}
+        {!isFilterCollapsed && (
+          <div style={{ borderTop: '1px solid var(--card-border)', paddingTop: '1.2rem', marginTop: '1.2rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <h4 style={{ fontSize: '1.25rem', color: 'var(--text-dark)', fontWeight: 'bold', margin: 0 }}>
+                    筛选第 {activeNightIndex + 1} 晚的酒店
+                  </h4>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: '0.2rem', margin: 0 }}>
+                    当前可支配吃住日均余额：约 <strong style={{ color: 'var(--primary)' }}>
+                      ¥{Math.round((budget - attractionsCost) / days)}
+                    </strong> 元
+                  </p>
                 </div>
               </div>
-            );
-          })}
-        </div>
+
+              {/* 过滤器容器 */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', background: 'rgba(255, 255, 255, 0.4)', backdropFilter: 'blur(8px)', border: '1.5px solid var(--card-border)', padding: '1.2rem', borderRadius: '16px', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.01)' }}>
+                {/* 区域选择 */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '0.88rem', fontWeight: 'bold', color: 'var(--text-dark)', minWidth: '80px' }}>🧭 按区域筛选:</span>
+                  <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                    {areas.map(area => (
+                      <button
+                        key={`filter-${area}`}
+                        onClick={() => setSelectedArea(area)}
+                        className={`filter-btn ${selectedArea === area ? 'active' : ''}`}
+                      >
+                        {area === 'All' ? '全部区域' : area}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 价格筛选 */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderTop: '1.5px dashed var(--card-border)', paddingTop: '1rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '0.88rem', fontWeight: 'bold', color: 'var(--text-dark)', minWidth: '80px' }}>💰 按价格筛选:</span>
+                  <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                    {[
+                      { value: 'All', label: '全部价格' },
+                      { value: 'under200', label: '¥200以下' },
+                      { value: '200to400', label: '¥200 - ¥400' },
+                      { value: 'over400', label: '¥400以上' },
+                      { value: 'budgetFit', label: '适合我的预算' }
+                    ].map(item => (
+                      <button
+                        key={`price-${item.value}`}
+                        onClick={() => setSelectedPriceRange(item.value)}
+                        className={`filter-btn ${selectedPriceRange === item.value ? 'active' : ''}`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* 3. 酒店列表与选择 */}
-      <div style={{ borderTop: '1px solid var(--card-border)', paddingTop: '1.5rem' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div>
-              <h4 style={{ fontSize: '1.25rem', color: 'var(--text-dark)', fontWeight: 'bold' }}>
-                筛选第 {activeNightIndex + 1} 晚的酒店
-              </h4>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: '0.2rem' }}>
-                当前可支配吃住日均余额：约 <strong style={{ color: 'var(--primary)' }}>
-                  ¥{Math.round((budget - attractionsCost) / days)}
-                </strong> 元
-              </p>
-            </div>
-          </div>
-
-          {/* 过滤器容器 */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', background: 'rgba(255, 255, 255, 0.4)', backdropFilter: 'blur(8px)', border: '1.5px solid var(--card-border)', padding: '1.2rem', borderRadius: '16px', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.01)' }}>
-            {/* 区域选择 */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.88rem', fontWeight: 'bold', color: 'var(--text-dark)', minWidth: '80px' }}>🧭 按区域筛选:</span>
-              <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
-                {areas.map(area => (
-                  <button
-                    key={`filter-${area}`}
-                    onClick={() => setSelectedArea(area)}
-                    className={`filter-btn ${selectedArea === area ? 'active' : ''}`}
-                  >
-                    {area === 'All' ? '全部区域' : area}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 价格筛选 */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderTop: '1.5px dashed var(--card-border)', paddingTop: '1rem', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.88rem', fontWeight: 'bold', color: 'var(--text-dark)', minWidth: '80px' }}>💰 按价格筛选:</span>
-              <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
-                {[
-                  { value: 'All', label: '全部价格' },
-                  { value: 'under200', label: '¥200以下' },
-                  { value: '200to400', label: '¥200 - ¥400' },
-                  { value: 'over400', label: '¥400以上' },
-                  { value: 'budgetFit', label: '适合我的预算' }
-                ].map(item => (
-                  <button
-                    key={`price-${item.value}`}
-                    onClick={() => setSelectedPriceRange(item.value)}
-                    className={`filter-btn ${selectedPriceRange === item.value ? 'active' : ''}`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
+      {/* 3. 酒店列表 */}
+      <div className="hotel-list-section">
         <div className="hotels-grid">
           {filteredHotels.map(hotel => {
             const isSelectedForActiveNight = selectedHotels[activeNightIndex]?.id === hotel.id;
@@ -356,33 +431,24 @@ export default function HotelRecommender({
 
             return (
               <div className={`hotel-card ${isSelectedForActiveNight ? 'selected' : ''}`} key={`hotel-${hotel.id}`}>
+                <div className="hotel-card-image-wrapper">
+                  <img src={getHotelImage(hotel.id, destination)} alt={hotel.name} className="hotel-card-image" loading="lazy" />
+                </div>
                 <div>
                   <div className="hotel-header">
                     <span className="hotel-name">{hotel.name}</span>
-                    <span className="hotel-rating">🔥 {hotel.socialHotRating}</span>
+                    <span className="tag tag-rating">🔥 {hotel.socialHotRating}</span>
                   </div>
                   {hotel.userVisited && (
-                    <div style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.3rem',
-                      background: hotel.userVisited === 'recommended' ? 'rgba(42, 157, 143, 0.12)' : 'rgba(230, 57, 70, 0.12)',
-                      color: hotel.userVisited === 'recommended' ? 'var(--secondary)' : 'var(--danger)',
-                      fontSize: '0.78rem',
-                      fontWeight: 'bold',
-                      padding: '0.25rem 0.6rem',
-                      borderRadius: '6px',
-                      marginBottom: '0.5rem',
-                      border: `1px solid ${hotel.userVisited === 'recommended' ? 'rgba(42, 157, 143, 0.3)' : 'rgba(230, 57, 70, 0.3)'}`
-                    }}>
+                    <div className={`hotel-review-badge ${hotel.userVisited}`}>
                       {destination === '三亚' ? (
-                        hotel.userVisited === 'recommended' ? '👑 阿曦入住 · 强烈推荐' : '⚠️ 阿曦入住 · 真实避坑'
+                        hotel.userVisited === 'recommended' ? '👑 阿曦入住 · 强烈推荐' : '⚠️ 避坑真实反馈'
                       ) : (
-                        hotel.userVisited === 'recommended' ? '👑 网友推荐 · 口碑极佳' : '⚠️ 网友避坑 · 真实反馈'
+                        hotel.userVisited === 'recommended' ? '👑 网友推荐 · 口碑极佳' : '⚠️ 避坑真实反馈'
                       )}
                     </div>
                   )}
-                  <div style={{ fontSize: '0.8rem', color: 'var(--primary)', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                  <div className="hotel-location-text">
                     📍 {hotel.area} · {hotel.subarea}
                   </div>
                   <div className="hotel-tags">
@@ -416,7 +482,7 @@ export default function HotelRecommender({
                       </button>
                       <div className={`comment-accordion-content ${expandedComments[hotel.id] ? 'expanded' : ''}`}>
                         <div style={{ color: 'var(--text-dark)', paddingTop: '0.2rem' }}>
-                          {hotel.socialCommentFeedback}
+                           {hotel.socialCommentFeedback}
                         </div>
                       </div>
                     </div>

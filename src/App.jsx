@@ -276,14 +276,42 @@ export default function App() {
     }
   };
 
+  const steps = [
+    { key: 'explore', label: '探索目的地', icon: '🧭' },
+    { key: 'itinerary', label: '规划每日日程', icon: '📅' },
+    { key: 'hotel', label: '筛选智能住宿', icon: '🏨' },
+    { key: 'packing', label: '准备行李清单', icon: '🎒' },
+    { key: 'export', label: '导出行程攻略', icon: '📤' }
+  ];
+  const stepKeys = steps.map(s => s.key);
+  const activeIndex = stepKeys.indexOf(activeTab);
+
   return (
     <div className="app-container">
       {/* 顶栏 Header */}
-      <header className="no-print">
-        <div className="logo">
-          <h1>RoamPlanner 漫游规划家</h1>
-          <p>BUDGET & ROUTE DRIVEN TRAVEL PLANNER</p>
+      <header className="app-header no-print">
+        <div className="logo-container" onClick={handleReset} style={{ cursor: step === 2 ? 'pointer' : 'default' }}>
+          <div className="logo-badge">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+            </svg>
+          </div>
+          <span className="logo-text">RoamPlanner</span>
         </div>
+        <nav className="header-nav">
+          {step === 2 ? (
+            <span className="nav-link-back-header" onClick={handleReset}>
+              ⬅️ 修改目的地与预算
+            </span>
+          ) : (
+            <>
+              <span className="nav-link" onClick={() => document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' })}>功能介绍</span>
+              <span className="nav-link" onClick={() => document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' })}>使用指南</span>
+              <span className="nav-link" onClick={() => document.getElementById('recent-trips-section')?.scrollIntoView({ behavior: 'smooth' })}>关于</span>
+            </>
+          )}
+        </nav>
       </header>
 
       {step === 1 ? (
@@ -304,60 +332,39 @@ export default function App() {
 
           {/* 右侧：标签导航与构建面板 */}
           <div className="main-content glass-card">
-            <div className="tab-navigation no-print" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
-              <button
-                className={`tab-btn ${activeTab === 'explore' ? 'active' : ''}`}
-                onClick={() => setActiveTab('explore')}
-              >
-                🧭 探索目的地
-              </button>
-              <button
-                className={`tab-btn ${activeTab === 'itinerary' ? 'active' : ''}`}
-                onClick={() => setActiveTab('itinerary')}
-              >
-                📅 规划每日日程
-              </button>
-              <button
-                className={`tab-btn ${activeTab === 'hotel' ? 'active' : ''}`}
-                onClick={() => setActiveTab('hotel')}
-              >
-                🏨 筛选智能住宿
-              </button>
-              <button
-                className={`tab-btn ${activeTab === 'packing' ? 'active' : ''}`}
-                onClick={() => setActiveTab('packing')}
-              >
-                🎒 准备行李清单
-              </button>
-              <button
-                className={`tab-btn ${activeTab === 'export' ? 'active' : ''}`}
-                onClick={() => setActiveTab('export')}
-              >
-                📤 导出行程攻略
-              </button>
-
-              <button
-                onClick={handleReset}
-                style={{
-                  marginLeft: 'auto',
-                  background: 'none',
-                  border: '1.5px solid var(--primary)',
-                  borderRadius: '20px',
-                  color: 'var(--primary)',
-                  padding: '0.4rem 1rem',
-                  fontSize: '0.82rem',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  transition: 'var(--transition-smooth)',
-                  marginBottom: '0.8rem'
-                }}
-                className="tab-btn-back-link"
-              >
-                ⬅️ 修改城市与预算
-              </button>
+            <div className="tab-navigation no-print">
+              <div className="stepper-progress-line">
+                <div 
+                  className="stepper-progress-fill" 
+                  style={{ width: `${(activeIndex / (steps.length - 1)) * 100}%` }}
+                />
+              </div>
+              {steps.map((s, idx) => {
+                const isCompleted = idx < activeIndex;
+                const isActive = s.key === activeTab;
+                const isFuture = idx > activeIndex;
+                
+                return (
+                  <button
+                    key={s.key}
+                    className={`tab-btn stepper-node ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''} ${isFuture ? 'future' : ''}`}
+                    onClick={() => setActiveTab(s.key)}
+                  >
+                    <div className="step-circle">
+                      {isCompleted ? (
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      ) : (
+                        <span className="step-num">{idx + 1}</span>
+                      )}
+                    </div>
+                    <span className="step-label">
+                      {s.icon} {s.label}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
             {activeTab === 'explore' && (
@@ -407,6 +414,9 @@ export default function App() {
           </div>
         </div>
       )}
+      <footer className="app-footer-disclaimer no-print">
+        声明：本平台所展示的景点与酒店图片均来源于公开网络，仅供个人规划参考；所有交通、门票及住宿价格均为网络公开估算值，请以实际预订为准。
+      </footer>
     </div>
   );
 }

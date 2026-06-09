@@ -18,25 +18,31 @@ export default function DestinationExplore({ config, onStartPlanning }) {
       {/* 城市大横幅 Header Banner */}
       <div
         style={{
-          background: 'linear-gradient(135deg, var(--primary), var(--warning))',
+          backgroundImage: `linear-gradient(90deg, rgba(30, 46, 38, 0.85) 0%, rgba(30, 46, 38, 0.45) 55%, rgba(0, 0, 0, 0) 100%), url(${
+            destination === '三亚' ? '/sanya_bg.png' :
+            destination === '成都' ? '/chengdu_bg.png' :
+            '/beijing_bg.png'
+          })`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 35%',
           borderRadius: '20px',
-          padding: '3rem 2rem',
-          textAlign: 'center',
+          padding: '5rem 4rem',
+          textAlign: 'left',
           color: '#ffffff',
           marginBottom: '2rem',
-          boxShadow: '0 10px 25px rgba(231, 111, 81, 0.15)',
+          boxShadow: '0 12px 36px rgba(45, 78, 63, 0.12)',
           position: 'relative',
           overflow: 'hidden'
         }}
       >
-        <div style={{ position: 'relative', zIndex: 2 }}>
-          <span style={{ fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.9)' }}>
-            EXPLORE DESTINATION
+        <div style={{ position: 'relative', zIndex: 2, maxWidth: '550px' }}>
+          <span style={{ fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.25em', color: 'var(--secondary)' }}>
+            Explore Destination
           </span>
-          <h2 style={{ fontFamily: 'var(--font-title)', fontSize: '3rem', fontWeight: 'bold', color: '#ffffff', margin: '0.5rem 0' }}>
+          <h2 style={{ fontFamily: 'var(--font-title)', fontSize: '3.4rem', fontWeight: '700', color: '#ffffff', margin: '0.6rem 0 0.8rem 0', letterSpacing: '0.02em', textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
             探索 · {destination}
           </h2>
-          <p style={{ fontSize: '1.25rem', fontWeight: '300', color: 'rgba(255,255,255,0.95)', fontStyle: 'italic' }}>
+          <p style={{ fontSize: '1.25rem', fontWeight: '300', color: 'rgba(255,255,255,0.95)', fontStyle: 'italic', letterSpacing: '0.05em' }}>
             「 {data.slogan} 」
           </p>
         </div>
@@ -46,10 +52,10 @@ export default function DestinationExplore({ config, onStartPlanning }) {
           position: 'absolute',
           top: '-20%',
           right: '-10%',
-          width: '300px',
-          height: '300px',
+          width: '350px',
+          height: '350px',
           borderRadius: '50%',
-          background: 'rgba(255,255,255,0.06)',
+          background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%)',
           zIndex: 1
         }} />
       </div>
@@ -74,52 +80,11 @@ export default function DestinationExplore({ config, onStartPlanning }) {
           </p>
         </div>
 
-        {/* 2. 玩乐区域分布指南 */}
-        <div>
-          <h3 style={{ fontSize: '1.3rem', color: 'var(--text-dark)', fontWeight: 'bold', marginBottom: '1.2rem', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            🧭 热门玩乐区域分布指南
-          </h3>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
-            {data.districts.map((dist, idx) => (
-              <div
-                key={`dist-${idx}`}
-                style={{
-                  background: '#ffffff',
-                  border: '1.5px solid var(--card-border)',
-                  borderRadius: '16px',
-                  padding: '1.5rem',
-                  boxShadow: 'var(--glass-shadow)',
-                  textAlign: 'left',
-                  transition: 'var(--transition-smooth)'
-                }}
-                className="district-guide-card"
-              >
-                <h4 style={{ fontSize: '1.1rem', color: 'var(--primary)', fontWeight: '700', marginBottom: '0.6rem' }}>
-                  {dist.name}
-                </h4>
-                <p style={{ fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: '1.6' }}>
-                  {dist.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
 
-
-
-        {/* 4. 底部行动呼吁 Button */}
-        <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+        <div style={{ textAlign: 'center', marginTop: '2.5rem', marginBottom: '1rem' }}>
           <button
-            className="btn-primary"
             onClick={onStartPlanning}
-            style={{
-              width: 'auto',
-              padding: '1rem 2.5rem',
-              fontSize: '1.1rem',
-              background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
-              boxShadow: '0 4px 20px rgba(42, 157, 143, 0.2)'
-            }}
+            className="explore-start-btn"
           >
             开始定制行程日程 ➔
           </button>

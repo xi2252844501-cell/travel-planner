@@ -243,7 +243,7 @@ export default function ItineraryBuilder({
                   <div className="timeline-day-badge">D{day.day}</div>
                   
                   <div className="timeline-day-header">
-                    <div>
+                    <div style={{ flex: 1, marginRight: '1.5rem', display: 'flex' }}>
                       <input
                         type="text"
                         value={day.title}
@@ -256,7 +256,7 @@ export default function ItineraryBuilder({
                         placeholder="修改这一天的主题..."
                       />
                     </div>
-                    <span className="subtitle">共 {day.spotIds.length} 个打卡点</span>
+                    <span className="subtitle" style={{ flexShrink: 0 }}>共 {day.spotIds.length} 个打卡点</span>
                   </div>
 
                   <div className="timeline-day-spots">

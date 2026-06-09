@@ -595,7 +595,8 @@ header {
   font-weight: 700;
   color: var(--text-dark);
   padding: 0.15rem 0;
-  width: 260px;
+  width: 100%;
+  max-width: 520px;
   outline: none !important;
   transition: var(--transition-smooth);
 }

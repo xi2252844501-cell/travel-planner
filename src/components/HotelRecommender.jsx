@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { hotelsData, attractionsData } from '../data/travelData';
 import { getHotelImage } from '../utils/imageMapper';
+import { getHotelTransitMeta, transitMeta, getHotelToSpotAdvice } from '../utils/transitRouter';
+
 
 export default function HotelRecommender({
   config,
@@ -12,10 +14,63 @@ export default function HotelRecommender({
   const { destination, days, budget } = config;
   const hotels = hotelsData[destination] || [];
   const attractions = attractionsData[destination] || [];
-  const nights = days - 1;
+  const nights = selectedHotels.length;
 
   // 当前正在为哪一晚选择酒店 (0-indexed)
   const [activeNightIndex, setActiveNightIndex] = useState(0);
+
+  // 获取与当前选择的这一晚关联的景点 (一般是当天及第二天的景点)
+  const getActiveNightSpotIds = () => {
+    const spots = [];
+    const currentDay = itinerary[activeNightIndex];
+    const nextDay = itinerary[activeNightIndex + 1];
+    if (currentDay) spots.push(...currentDay.spotIds);
+    if (nextDay) spots.push(...nextDay.spotIds);
+    // 如果都没有，就拿全部已选的景点作为底线参考
+    if (spots.length === 0) {
+      itinerary.forEach(day => {
+        spots.push(...day.spotIds);
+      });
+    }
+    return [...new Set(spots)];
+  };
+
+  const activeNightSpotIds = getActiveNightSpotIds();
+
+  // 计算酒店到当前关联景点的最小区域差值 (作为距离权重，zone 差越小越近)
+  const getMinZoneDiff = (hotel) => {
+    const hotelMeta = getHotelTransitMeta(hotel, destination);
+    if (!hotelMeta || activeNightSpotIds.length === 0) return 999;
+    
+    let minDiff = 999;
+    activeNightSpotIds.forEach(spotId => {
+      const spotMeta = transitMeta[spotId];
+      if (spotMeta) {
+        const diff = Math.abs((hotelMeta.zone || 0) - (spotMeta.zone || 0));
+        if (diff < minDiff) minDiff = diff;
+      }
+    });
+    return minDiff;
+  };
+
+
+  // 增加一晚住宿
+  const handleAddNight = () => {
+    onUpdateHotels([...selectedHotels, null]);
+  };
+
+  // 删除一晚住宿
+  const handleDeleteNight = (index) => {
+    if (selectedHotels.length <= 1) {
+      alert('请至少保留一晚住宿！');
+      return;
+    }
+    const updated = selectedHotels.filter((_, idx) => idx !== index);
+    onUpdateHotels(updated);
+    if (activeNightIndex >= updated.length) {
+      setActiveNightIndex(Math.max(0, updated.length - 1));
+    }
+  };
   // 区域过滤状态
   const [selectedArea, setSelectedArea] = useState('All');
   // 价格过滤状态 ('All' | 'under200' | '200to400' | 'over400' | 'budgetFit')
@@ -170,6 +225,14 @@ export default function HotelRecommender({
     const searchMatch = !searchQuery.trim() || h.name.toLowerCase().includes(searchQuery.toLowerCase().trim());
     return areaMatch && priceMatch && searchMatch;
   });
+
+  // 4. 智能位置排序：如果用户规划了当前夜晚的关联景点，则优先将地理位置近（zone 差值小）的酒店排在上方
+  const sortedHotels = [...filteredHotels].sort((a, b) => {
+    const diffA = getMinZoneDiff(a);
+    const diffB = getMinZoneDiff(b);
+    return diffA - diffB;
+  });
+
 
   // 一键智能匹配全程酒店住宿
   const handleAutoRecommendAll = () => {
@@ -345,8 +408,34 @@ export default function HotelRecommender({
                     transition: 'var(--transition-smooth)'
                   }}
                 >
-                  <div style={{ fontSize: '0.75rem', color: isActive ? 'var(--primary)' : 'var(--text-muted)', fontWeight: 'bold' }}>
-                    第 {index + 1} 晚住宿 {isActive && '👉'}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: isActive ? 'var(--primary)' : 'var(--text-muted)', fontWeight: 'bold' }}>
+                      第 {index + 1} 晚住宿 {isActive && '👉'}
+                    </div>
+                    {selectedHotels.length > 1 && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm(`确定要删除第 ${index + 1} 晚住宿吗？`)) {
+                            handleDeleteNight(index);
+                          }
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--danger)',
+                          cursor: 'pointer',
+                          padding: '0 2px',
+                          fontSize: '0.9rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          userSelect: 'none'
+                        }}
+                        title="删除此晚住宿"
+                      >
+                        🗑️
+                      </button>
+                    )}
                   </div>
                   <div style={{ fontSize: '0.9rem', fontWeight: 'bold', color: hotel ? 'var(--text-dark)' : 'var(--danger)', marginTop: '0.2rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {hotel ? hotel.name : '未选择酒店'}
@@ -357,6 +446,36 @@ export default function HotelRecommender({
                 </div>
               );
             })}
+
+            {/* ➕ 增加一晚按钮 */}
+            <div
+              onClick={handleAddNight}
+              style={{
+                background: 'rgba(45,78,63,0.02)',
+                border: '1.5px dashed var(--primary)',
+                borderRadius: '10px',
+                padding: '0.8rem 1.2rem',
+                minWidth: '120px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--primary)',
+                fontWeight: 'bold',
+                fontSize: '0.85rem',
+                transition: 'var(--transition-smooth)',
+                flexShrink: 0
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--primary-glow)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(45,78,63,0.02)';
+              }}
+              className="no-print"
+            >
+              ➕ 增加一晚
+            </div>
           </div>
         </div>
 
@@ -425,9 +544,14 @@ export default function HotelRecommender({
       {/* 3. 酒店列表 */}
       <div className="hotel-list-section">
         <div className="hotels-grid">
-          {filteredHotels.map(hotel => {
+          {sortedHotels.map(hotel => {
             const isSelectedForActiveNight = selectedHotels[activeNightIndex]?.id === hotel.id;
             const totalSelectNights = selectedHotels.filter(h => h?.id === hotel.id).length;
+
+            const minZoneDiff = getMinZoneDiff(hotel);
+            const firstSpotId = activeNightSpotIds[0];
+            const firstSpot = firstSpotId ? attractions.find(s => s.id === firstSpotId) : null;
+            const commuteAdvice = firstSpotId ? getHotelToSpotAdvice(destination, hotel, firstSpotId) : null;
 
             return (
               <div className={`hotel-card ${isSelectedForActiveNight ? 'selected' : ''}`} key={`hotel-${hotel.id}`}>
@@ -439,18 +563,46 @@ export default function HotelRecommender({
                     <span className="hotel-name">{hotel.name}</span>
                     <span className="tag tag-rating">🔥 {hotel.socialHotRating}</span>
                   </div>
-                  {hotel.userVisited && (
-                    <div className={`hotel-review-badge ${hotel.userVisited}`}>
-                      {destination === '三亚' ? (
-                        hotel.userVisited === 'recommended' ? '👑 阿曦入住 · 强烈推荐' : '⚠️ 避坑真实反馈'
-                      ) : (
-                        hotel.userVisited === 'recommended' ? '👑 网友推荐 · 口碑极佳' : '⚠️ 避坑真实反馈'
-                      )}
-                    </div>
-                  )}
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.4rem' }}>
+                    {hotel.userVisited && (
+                      <div className={`hotel-review-badge ${hotel.userVisited}`} style={{ margin: 0 }}>
+                        {destination === '三亚' ? (
+                          hotel.userVisited === 'recommended' ? '👑 阿曦入住 · 强烈推荐' : '⚠️ 避坑真实反馈'
+                        ) : (
+                          hotel.userVisited === 'recommended' ? '👑 网友推荐 · 口碑极佳' : '⚠️ 避坑真实反馈'
+                        )}
+                      </div>
+                    )}
+                    {minZoneDiff === 0 && activeNightSpotIds.length > 0 && (
+                      <div className="hotel-review-badge recommended" style={{ margin: 0, background: 'rgba(212, 163, 89, 0.12)', color: '#a88f6c', borderColor: 'rgba(212, 163, 89, 0.25)' }}>
+                        📍 距离首选
+                      </div>
+                    )}
+                  </div>
                   <div className="hotel-location-text">
                     📍 {hotel.area} · {hotel.subarea}
                   </div>
+                  {commuteAdvice && firstSpot && (
+                    <div style={{
+                      marginTop: '0.45rem',
+                      fontSize: '0.78rem',
+                      color: 'var(--primary)',
+                      background: 'var(--primary-glow)',
+                      padding: '0.4rem 0.65rem',
+                      borderRadius: '8px',
+                      border: '1.2px solid rgba(45, 78, 63, 0.08)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      lineHeight: '1.4'
+                    }}>
+                      <span style={{ fontSize: '0.95rem' }}>{commuteAdvice.icon}</span>
+                      <span>
+                        <strong>去【{firstSpot.name}】：</strong>
+                        {commuteAdvice.text.replace(/地铁直达：|地铁换乘：|公交直达：|公交换乘：|近距步行：|步行直达：|轮渡\+公交：|公交\+轮渡：|快船\+公交：|公交\+快船：|市郊铁路\/专线：|地铁\+接驳线：|城际动车\+公交：|城际动车\+接驳：/g, '')}
+                      </span>
+                    </div>
+                  )}
                   <div className="hotel-tags">
                     {hotel.tags.map(t => (
                       <span className="hotel-tag" key={t}>{t}</span>

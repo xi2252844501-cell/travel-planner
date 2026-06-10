@@ -115,7 +115,7 @@ export default function App() {
     setItinerary(initialItinerary);
 
     // 初始化空酒店
-    const initialHotels = Array(newConfig.days - 1).fill(null);
+    const initialHotels = Array(Math.max(1, newConfig.days - 1)).fill(null);
     setSelectedHotels(initialHotels);
 
     // 初始化行李清单
@@ -163,9 +163,9 @@ export default function App() {
   const handleAutoRecommendHotels = (currentItinerary = itinerary, silent = false) => {
     if (!config) return;
     const { destination, days, budget } = config;
-    const nights = days - 1;
+    const nights = Math.max(1, days - 1);
     if (nights <= 0) {
-      if (!silent) alert('您选择的旅行天数为 1 天，无需安排住宿！');
+      if (!silent) alert('您当前没有安排任何住宿晚数，无需智能匹配住宿！');
       return;
     }
 
@@ -276,6 +276,65 @@ export default function App() {
     }
   };
 
+  // 增加一天日程
+  const handleAddDay = () => {
+    if (!config) return;
+    const newDays = config.days + 1;
+    setConfig(prev => ({ ...prev, days: newDays }));
+    
+    const newDay = {
+      day: newDays,
+      title: `第 ${newDays} 天行程规划`,
+      spotIds: [],
+      desc: '自由探索时间'
+    };
+    setItinerary(prev => [...prev, newDay]);
+  };
+
+  // 删除一天日程
+  const handleDeleteDay = (dayNum) => {
+    if (!config) return;
+    if (config.days <= 1) {
+      alert('您的行程至少需要 1 天！');
+      return;
+    }
+    const newDays = config.days - 1;
+    setConfig(prev => ({ ...prev, days: newDays }));
+
+    const filtered = itinerary.filter(d => d.day !== dayNum);
+    const updated = filtered.map((d, idx) => ({
+      ...d,
+      day: idx + 1,
+      title: d.title.startsWith('第 ') && (d.title.endsWith(' 天行程规划') || d.title.endsWith(' 天行程'))
+        ? `第 ${idx + 1} 天行程规划`
+        : d.title
+    }));
+    setItinerary(updated);
+  };
+
+  // 应用经典路线模板，自动适配天数并重新初始化酒店列表
+  const handleApplyTemplate = (template) => {
+    if (!config) return;
+    const templateDays = template.schedule.length;
+    
+    // 1. 同步更新配置中的天数
+    setConfig(prev => ({ ...prev, days: templateDays }));
+    
+    // 2. 将模板数据格式化并写入日程状态
+    const formatted = template.schedule.map(d => ({
+      day: d.day,
+      title: d.title,
+      spotIds: [...d.spotIds],
+      desc: d.desc || '自由探索时间'
+    }));
+    setItinerary(formatted);
+    
+    // 3. 酒店房间同步扩充为 templateDays - 1 晚 (最少 1 晚) 并全部初始化为 null
+    const newNights = Math.max(1, templateDays - 1);
+    setSelectedHotels(Array(newNights).fill(null));
+  };
+
+
   const steps = [
     { key: 'explore', label: '探索目的地', icon: '🧭' },
     { key: 'itinerary', label: '规划每日日程', icon: '📅' },
@@ -380,7 +439,10 @@ export default function App() {
                 itinerary={itinerary}
                 onChangeItinerary={setItinerary}
                 onAutoRecommendHotels={handleAutoRecommendHotels}
+                onApplyTemplate={handleApplyTemplate}
                 selectedHotels={selectedHotels}
+                onAddDay={handleAddDay}
+                onDeleteDay={handleDeleteDay}
               />
             )}
 

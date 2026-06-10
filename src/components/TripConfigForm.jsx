@@ -74,7 +74,7 @@ export default function TripConfigForm({ onSubmit, initialValues }) {
   const [departure, setDeparture] = useState(initialValues?.departure || '北京');
   const [destination, setDestination] = useState(initialValues?.destination || '三亚');
   const [budget, setBudget] = useState(initialValues?.budget || 5000);
-  const [days, setDays] = useState(initialValues?.days || 5);
+  const [days, setDays] = useState(initialValues?.days || 1);
   
   const formRef = useRef(null);
   const [highlightActive, setHighlightActive] = useState(false);
@@ -176,7 +176,7 @@ export default function TripConfigForm({ onSubmit, initialValues }) {
                   <input
                     type="number"
                     id="days"
-                    min="2"
+                    min="1"
                     max="15"
                     step="1"
                     value={days}

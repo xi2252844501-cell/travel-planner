@@ -8,7 +8,10 @@ export default function ItineraryBuilder({
   itinerary,
   onChangeItinerary,
   onAutoRecommendHotels,
-  selectedHotels
+  onApplyTemplate,
+  selectedHotels,
+  onAddDay,
+  onDeleteDay
 }) {
   const { destination, days } = config;
   const attractions = attractionsData[destination] || [];
@@ -61,27 +64,7 @@ export default function ItineraryBuilder({
 
   // 应用选中的模板到行程中
   const handleApplyTemplate = (template) => {
-    // 将模板格式化为当前行程天数大小的数组
-    const formatted = Array.from({ length: days }, (_, i) => {
-      const dayNum = i + 1;
-      const templateDay = template.schedule.find(d => d.day === dayNum);
-      if (templateDay) {
-        return {
-          day: dayNum,
-          title: templateDay.title,
-          spotIds: [...templateDay.spotIds],
-          desc: templateDay.desc
-        };
-      } else {
-        return {
-          day: dayNum,
-          title: `第 ${dayNum} 天行程`,
-          spotIds: [],
-          desc: '自由探索时间'
-        };
-      }
-    });
-    onChangeItinerary(formatted);
+    onApplyTemplate(template);
     setShowTemplateModal(false);
   };
 
@@ -243,7 +226,7 @@ export default function ItineraryBuilder({
                   <div className="timeline-day-badge">D{day.day}</div>
                   
                   <div className="timeline-day-header">
-                    <div style={{ flex: 1, marginRight: '1.5rem', display: 'flex' }}>
+                    <div style={{ flex: 1, marginRight: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                       <input
                         type="text"
                         value={day.title}
@@ -255,6 +238,30 @@ export default function ItineraryBuilder({
                         className="timeline-day-title-input"
                         placeholder="修改这一天的主题..."
                       />
+                      {itinerary.length > 1 && (
+                        <button
+                          onClick={() => {
+                            if (window.confirm(`确定要删除第 ${day.day} 天行程吗？该天的打卡计划也将被清除。`)) {
+                              onDeleteDay(day.day);
+                            }
+                          }}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: 'var(--danger)',
+                            cursor: 'pointer',
+                            fontSize: '1.15rem',
+                            padding: '0.2rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            transition: 'var(--transition-smooth)',
+                            userSelect: 'none'
+                          }}
+                          title="删除此日程"
+                        >
+                          🗑️
+                        </button>
+                      )}
                     </div>
                     <span className="subtitle" style={{ flexShrink: 0 }}>共 {day.spotIds.length} 个打卡点</span>
                   </div>
@@ -399,6 +406,38 @@ export default function ItineraryBuilder({
                 </div>
               );
             })}
+
+            {/* 添加一天日程按钮 */}
+            <div style={{ paddingLeft: '0px', marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-start' }} className="no-print">
+              <button
+                onClick={onAddDay}
+                className="workbench-action-btn"
+                style={{
+                  padding: '0.6rem 1.5rem',
+                  borderRadius: '20px',
+                  border: '1.5px dashed var(--primary)',
+                  background: 'rgba(45, 78, 63, 0.02)',
+                  color: 'var(--primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  boxShadow: 'none',
+                  transition: 'var(--transition-smooth)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--primary-glow)';
+                  e.currentTarget.style.borderStyle = 'solid';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(45, 78, 63, 0.02)';
+                  e.currentTarget.style.borderStyle = 'dashed';
+                }}
+              >
+                ➕ 增加一天日程
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -489,23 +528,10 @@ export default function ItineraryBuilder({
                         <span className="template-days-badge">{tpl.days}天游</span>
                       </div>
 
-                      {/* Day count compatibility warning */}
-                      {dayDiff === 0 ? (
-                        <div className="template-warning success-theme" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                          <span>🟢</span>
-                          <span>完美契合您当前配置的 {days} 天行程！</span>
-                        </div>
-                      ) : dayDiff < 0 ? (
-                        <div className="template-warning warning-theme" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                          <span>💡</span>
-                          <span>此模板为 {tpl.days} 天，应用后 Day {tpl.days + 1} 到 Day {days} 将自动保留为“自由探索”时间。</span>
-                        </div>
-                      ) : (
-                        <div className="template-warning danger-theme" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                          <span>⚠️</span>
-                          <span>此模板为 {tpl.days} 天，由于您当前只设置了 {days} 天行程，应用后仅会加载模板前 {days} 天的打卡计划。</span>
-                        </div>
-                      )}
+                      <div className="template-warning success-theme" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <span>✨</span>
+                        <span>此模板为 {tpl.days} 天，应用后日程天数与所需酒店晚数将自动同步！</span>
+                      </div>
 
                       {/* Day-by-Day schedule preview */}
                       <div className="template-schedule-preview">
